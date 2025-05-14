@@ -208,7 +208,6 @@ export async function registerUser({
     if (data?.user && !error) {
       try {
         // Prepare profile data for the users table update
-<<<<<<< HEAD
         const profileData: {
           first_name?: string;
           last_name?: string;
@@ -236,9 +235,6 @@ export async function registerUser({
           skck_url?: string;
           vehicle_photo_url?: string;
         } = {};
-=======
-        const profileData = {};
->>>>>>> a73acc1 (Reconnect to GitHub from VS Code)
 
         // Only add fields that have values
         if (firstName) profileData.first_name = firstName;

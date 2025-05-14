@@ -35,13 +35,9 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
             className={errors.firstName ? "border-red-500" : ""}
           />
           {errors.firstName && (
-<<<<<<< HEAD
             <p className="text-sm text-red-500">
               {errors.firstName.message as string}
             </p>
-=======
-            <p className="text-sm text-red-500">{errors.firstName.message}</p>
->>>>>>> a73acc1 (Reconnect to GitHub from VS Code)
           )}
         </div>
 
@@ -56,13 +52,9 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
             className={errors.lastName ? "border-red-500" : ""}
           />
           {errors.lastName && (
-<<<<<<< HEAD
             <p className="text-sm text-red-500">
               {errors.lastName.message as string}
             </p>
-=======
-            <p className="text-sm text-red-500">{errors.lastName.message}</p>
->>>>>>> a73acc1 (Reconnect to GitHub from VS Code)
           )}
         </div>
       </div>
@@ -78,13 +70,9 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
           className={errors.fullName ? "border-red-500" : ""}
         />
         {errors.fullName && (
-<<<<<<< HEAD
           <p className="text-sm text-red-500">
             {errors.fullName.message as string}
           </p>
-=======
-          <p className="text-sm text-red-500">{errors.fullName.message}</p>
->>>>>>> a73acc1 (Reconnect to GitHub from VS Code)
         )}
       </div>
 
@@ -100,13 +88,9 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
           className={errors.email ? "border-red-500" : ""}
         />
         {errors.email && (
-<<<<<<< HEAD
           <p className="text-sm text-red-500">
             {errors.email.message as string}
           </p>
-=======
-          <p className="text-sm text-red-500">{errors.email.message}</p>
->>>>>>> a73acc1 (Reconnect to GitHub from VS Code)
         )}
       </div>
 
@@ -122,13 +106,9 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
           className={errors.password ? "border-red-500" : ""}
         />
         {errors.password && (
-<<<<<<< HEAD
           <p className="text-sm text-red-500">
             {errors.password.message as string}
           </p>
-=======
-          <p className="text-sm text-red-500">{errors.password.message}</p>
->>>>>>> a73acc1 (Reconnect to GitHub from VS Code)
         )}
       </div>
 
@@ -141,13 +121,9 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
           className={errors.ktpAddress ? "border-red-500" : ""}
         />
         {errors.ktpAddress && (
-<<<<<<< HEAD
           <p className="text-sm text-red-500">
             {errors.ktpAddress.message as string}
           </p>
-=======
-          <p className="text-sm text-red-500">{errors.ktpAddress.message}</p>
->>>>>>> a73acc1 (Reconnect to GitHub from VS Code)
         )}
       </div>
 
@@ -160,13 +136,9 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
           className={errors.ktpNumber ? "border-red-500" : ""}
         />
         {errors.ktpNumber && (
-<<<<<<< HEAD
           <p className="text-sm text-red-500">
             {errors.ktpNumber.message as string}
           </p>
-=======
-          <p className="text-sm text-red-500">{errors.ktpNumber.message}</p>
->>>>>>> a73acc1 (Reconnect to GitHub from VS Code)
         )}
       </div>
 
@@ -191,13 +163,9 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
           </SelectContent>
         </Select>
         {errors.religion && (
-<<<<<<< HEAD
           <p className="text-sm text-red-500">
             {errors.religion.message as string}
           </p>
-=======
-          <p className="text-sm text-red-500">{errors.religion.message}</p>
->>>>>>> a73acc1 (Reconnect to GitHub from VS Code)
         )}
       </div>
 
@@ -210,13 +178,9 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
           className={errors.ethnicity ? "border-red-500" : ""}
         />
         {errors.ethnicity && (
-<<<<<<< HEAD
           <p className="text-sm text-red-500">
             {errors.ethnicity.message as string}
           </p>
-=======
-          <p className="text-sm text-red-500">{errors.ethnicity.message}</p>
->>>>>>> a73acc1 (Reconnect to GitHub from VS Code)
         )}
       </div>
 
@@ -229,13 +193,9 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
           className={errors.education ? "border-red-500" : ""}
         />
         {errors.education && (
-<<<<<<< HEAD
           <p className="text-sm text-red-500">
             {errors.education.message as string}
           </p>
-=======
-          <p className="text-sm text-red-500">{errors.education.message}</p>
->>>>>>> a73acc1 (Reconnect to GitHub from VS Code)
         )}
       </div>
     </div>

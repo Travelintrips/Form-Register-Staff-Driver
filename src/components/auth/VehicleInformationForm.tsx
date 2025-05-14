@@ -28,13 +28,9 @@ const VehicleInformationForm: React.FC<VehicleInformationFormProps> = ({
             className={errors.vehicleName ? "border-red-500" : ""}
           />
           {errors.vehicleName && (
-<<<<<<< HEAD
             <p className="text-sm text-red-500">
               {errors.vehicleName.message as string}
             </p>
-=======
-            <p className="text-sm text-red-500">{errors.vehicleName.message}</p>
->>>>>>> a73acc1 (Reconnect to GitHub from VS Code)
           )}
         </div>
 
@@ -51,13 +47,9 @@ const VehicleInformationForm: React.FC<VehicleInformationFormProps> = ({
             className={errors.vehicleType ? "border-red-500" : ""}
           />
           {errors.vehicleType && (
-<<<<<<< HEAD
             <p className="text-sm text-red-500">
               {errors.vehicleType.message as string}
             </p>
-=======
-            <p className="text-sm text-red-500">{errors.vehicleType.message}</p>
->>>>>>> a73acc1 (Reconnect to GitHub from VS Code)
           )}
         </div>
       </div>
@@ -77,11 +69,7 @@ const VehicleInformationForm: React.FC<VehicleInformationFormProps> = ({
           />
           {errors.vehicleBrand && (
             <p className="text-sm text-red-500">
-<<<<<<< HEAD
               {errors.vehicleBrand.message as string}
-=======
-              {errors.vehicleBrand.message}
->>>>>>> a73acc1 (Reconnect to GitHub from VS Code)
             </p>
           )}
         </div>
@@ -100,11 +88,7 @@ const VehicleInformationForm: React.FC<VehicleInformationFormProps> = ({
           />
           {errors.licensePlate && (
             <p className="text-sm text-red-500">
-<<<<<<< HEAD
               {errors.licensePlate.message as string}
-=======
-              {errors.licensePlate.message}
->>>>>>> a73acc1 (Reconnect to GitHub from VS Code)
             </p>
           )}
         </div>
@@ -125,13 +109,9 @@ const VehicleInformationForm: React.FC<VehicleInformationFormProps> = ({
             className={errors.vehicleYear ? "border-red-500" : ""}
           />
           {errors.vehicleYear && (
-<<<<<<< HEAD
             <p className="text-sm text-red-500">
               {errors.vehicleYear.message as string}
             </p>
-=======
-            <p className="text-sm text-red-500">{errors.vehicleYear.message}</p>
->>>>>>> a73acc1 (Reconnect to GitHub from VS Code)
           )}
         </div>
 
@@ -149,11 +129,7 @@ const VehicleInformationForm: React.FC<VehicleInformationFormProps> = ({
           />
           {errors.vehicleColor && (
             <p className="text-sm text-red-500">
-<<<<<<< HEAD
               {errors.vehicleColor.message as string}
-=======
-              {errors.vehicleColor.message}
->>>>>>> a73acc1 (Reconnect to GitHub from VS Code)
             </p>
           )}
         </div>
@@ -172,13 +148,9 @@ const VehicleInformationForm: React.FC<VehicleInformationFormProps> = ({
           className={errors.vehicleStatus ? "border-red-500" : ""}
         />
         {errors.vehicleStatus && (
-<<<<<<< HEAD
           <p className="text-sm text-red-500">
             {errors.vehicleStatus.message as string}
           </p>
-=======
-          <p className="text-sm text-red-500">{errors.vehicleStatus.message}</p>
->>>>>>> a73acc1 (Reconnect to GitHub from VS Code)
         )}
       </div>
     </div>
