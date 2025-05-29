@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface PersonalInformationFormProps {
   register: UseFormRegister<any>;
@@ -21,12 +22,13 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
   errors,
   setValue,
 }) => {
+  const { t } = useLanguage();
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="firstName">
-            First Name <span className="text-red-500">*</span>
+            {t("form.firstName")} <span className="text-red-500">*</span>
           </Label>
           <Input
             id="firstName"
@@ -43,7 +45,7 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
 
         <div className="space-y-2">
           <Label htmlFor="lastName">
-            Last Name <span className="text-red-500">*</span>
+            {t("form.lastName")} <span className="text-red-500">*</span>
           </Label>
           <Input
             id="lastName"
@@ -61,7 +63,7 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
 
       <div className="space-y-2">
         <Label htmlFor="fullName">
-          Full Name <span className="text-red-500">*</span>
+          {t("form.fullName")} <span className="text-red-500">*</span>
         </Label>
         <Input
           id="fullName"
@@ -78,7 +80,7 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
 
       <div className="space-y-2">
         <Label htmlFor="email">
-          Email <span className="text-red-500">*</span>
+          {t("auth.email")} <span className="text-red-500">*</span>
         </Label>
         <Input
           id="email"
@@ -96,7 +98,7 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
 
       <div className="space-y-2">
         <Label htmlFor="personalInfoPassword">
-          Password <span className="text-red-500">*</span>
+          {t("auth.password")} <span className="text-red-500">*</span>
         </Label>
         <Input
           id="personalInfoPassword"
@@ -113,7 +115,7 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="ktpAddress">KTP Address</Label>
+        <Label htmlFor="ktpAddress">{t("form.ktpAddress")}</Label>
         <Input
           id="ktpAddress"
           placeholder="Address as per KTP"
@@ -128,7 +130,7 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="ktpNumber">KTP Number</Label>
+        <Label htmlFor="ktpNumber">{t("form.ktpNumber")}</Label>
         <Input
           id="ktpNumber"
           placeholder="KTP Number"
@@ -143,14 +145,14 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="religion">Religion</Label>
+        <Label htmlFor="religion">{t("form.religion")}</Label>
         <Select
           onValueChange={(value) => {
             setValue("religion", value); // ✅ ini yang penting
           }}
         >
           <SelectTrigger className={errors.religion ? "border-red-500" : ""}>
-            <SelectValue placeholder="Select Religion" />
+            <SelectValue placeholder={t("religion.select")} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="Islam">Islam</SelectItem>
@@ -170,13 +172,28 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="ethnicity">Ethnicity</Label>
-        <Input
+        <Label htmlFor="ethnicity" className="text-sm">
+          {t("form.ethnicity")}
+        </Label>
+        <select
           id="ethnicity"
-          placeholder="Ethnicity"
           {...register("ethnicity")}
-          className={errors.ethnicity ? "border-red-500" : ""}
-        />
+          className={`w-full border rounded px-3 py-2 text-sm ${
+            errors.ethnicity ? "border-red-500" : "border-gray-300"
+          }`}
+        >
+          <option value="">{t("ethnicity.select")}</option>
+          <option value="Sunda">Sunda</option>
+          <option value="Batak">Batak</option>
+          <option value="Jawa">Jawa</option>
+          <option value="Madura">Madura</option>
+          <option value="Dayak">Dayak</option>
+          <option value="Betawi">Betawi</option>
+          <option value="Asmat">Asmat</option>
+          <option value="Bugis">Bugis</option>
+          <option value="Ambon">Ambon</option>
+          <option value="Balinese">Balinese</option>
+        </select>
         {errors.ethnicity && (
           <p className="text-sm text-red-500">
             {errors.ethnicity.message as string}
@@ -185,13 +202,24 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="education">Education</Label>
-        <Input
+        <Label htmlFor="education" className="text-sm">
+          {t("form.education")}
+        </Label>
+        <select
           id="education"
-          placeholder="Highest Education"
           {...register("education")}
-          className={errors.education ? "border-red-500" : ""}
-        />
+          className={`w-full border rounded px-3 py-2 text-sm ${
+            errors.education ? "border-red-500" : "border-gray-300"
+          }`}
+        >
+          <option value="">{t("education.select")}</option>
+          <option value="SMP">SMP</option>
+          <option value="SMA">SMA</option>
+          <option value="SMK">SMK</option>
+          <option value="S1">S1</option>
+          <option value="S2">S2</option>
+          <option value="S3">S3</option>
+        </select>
         {errors.education && (
           <p className="text-sm text-red-500">
             {errors.education.message as string}

@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader2, LogIn } from "lucide-react";
 import { loginUser } from "@/lib/supabase/auth";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,7 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 const LoginForm = () => {
+  const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
@@ -64,7 +66,7 @@ const LoginForm = () => {
         throw new Error(error.message);
       }
 
-      setFormSuccess("Login successful! Redirecting...");
+      setFormSuccess(t("auth.loginSuccess"));
       reset();
 
       // Redirect to home page after successful login
@@ -86,10 +88,11 @@ const LoginForm = () => {
     <Card className="w-full max-w-md p-6 rounded-xl shadow-lg bg-white">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold text-center">
-          Sign in to your account
+          {t("auth.signin.title") || "Sign in to your account"}
         </CardTitle>
         <CardDescription className="text-center">
-          Enter your email and password to sign in
+          {t("auth.signin.subtitle") ||
+            "Enter your email and password to sign in"}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -108,7 +111,7 @@ const LoginForm = () => {
 
           <div className="space-y-2">
             <Label htmlFor="email">
-              Email <span className="text-red-500">*</span>
+              {t("auth.email")} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="email"
@@ -125,13 +128,13 @@ const LoginForm = () => {
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <Label htmlFor="password">
-                Password <span className="text-red-500">*</span>
+                {t("auth.password")} <span className="text-red-500">*</span>
               </Label>
               <a
                 href="/forgot-password"
                 className="text-sm text-blue-600 hover:underline"
               >
-                Forgot password?
+                {t("auth.forgotPassword")}
               </a>
             </div>
             <Input
@@ -150,12 +153,12 @@ const LoginForm = () => {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                <span>Signing in...</span>
+                <span>{t("auth.signingIn")}</span>
               </>
             ) : (
               <>
                 <LogIn className="mr-2 h-4 w-4" />
-                <span>Sign in</span>
+                <span>{t("auth.signin")}</span>
               </>
             )}
           </Button>
@@ -163,9 +166,9 @@ const LoginForm = () => {
       </CardContent>
       <CardFooter className="flex justify-center">
         <p className="text-sm text-gray-600">
-          Don't have an account?{" "}
+          {t("auth.noAccount")}{" "}
           <a href="/" className="text-blue-600 hover:underline font-medium">
-            Sign up
+            {t("auth.signup")}
           </a>
         </p>
       </CardFooter>

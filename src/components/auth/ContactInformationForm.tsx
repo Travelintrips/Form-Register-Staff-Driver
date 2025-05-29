@@ -2,6 +2,7 @@ import React from "react";
 import { UseFormRegister, FieldErrors } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface ContactInformationFormProps {
   register: UseFormRegister<any>;
@@ -12,11 +13,12 @@ const ContactInformationForm: React.FC<ContactInformationFormProps> = ({
   register,
   errors,
 }) => {
+  const { t } = useLanguage();
   return (
     <div className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="phoneNumber">
-          Phone Number <span className="text-red-500">*</span>
+          {t("form.phoneNumber")} <span className="text-red-500">*</span>
         </Label>
         <Input
           id="phoneNumber"
@@ -32,7 +34,7 @@ const ContactInformationForm: React.FC<ContactInformationFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="familyPhoneNumber">Family Phone Number</Label>
+        <Label htmlFor="familyPhoneNumber">{t("form.familyPhoneNumber")}</Label>
         <Input
           id="familyPhoneNumber"
           placeholder="+62 123456789"
@@ -47,7 +49,7 @@ const ContactInformationForm: React.FC<ContactInformationFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="simNumber">SIM Number</Label>
+        <Label htmlFor="simNumber">{t("form.simNumber")}</Label>
         <Input
           id="simNumber"
           placeholder="SIM Number"
@@ -62,7 +64,7 @@ const ContactInformationForm: React.FC<ContactInformationFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="simExpiryDate">SIM Expiry Date</Label>
+        <Label htmlFor="simExpiryDate">{t("form.simExpiryDate")}</Label>
         <Input
           id="simExpiryDate"
           type="date"

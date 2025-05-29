@@ -318,6 +318,64 @@ export async function registerUser({
             console.error("Error inserting into staff:", insertStaffError);
           }
         }
+
+        // Insert data into drivers table if role is Driver Mitra or Driver Perusahaan
+        if (role === "Driver Mitra" || role === "Driver Perusahaan") {
+          const driverData = {
+            id: data.user.id,
+            name: fullName || "",
+            email: email || "",
+            phone: phoneNumber || "",
+            phone_number: phoneNumber ? Number(phoneNumber) : null,
+            full_name: fullName || "",
+            first_name: firstName || "",
+            last_name: lastName || "",
+            role_id: roleId,
+            role_name: role || "",
+            religion: religion || null,
+            ktp_address: ktpAddress || "",
+            address: ktpAddress || "",
+            ktp_number: ktpNumber || "",
+            relative_phone: familyPhoneNumber || "",
+            family_phone: familyPhoneNumber || "",
+            license_number: simNumber || "",
+
+            selfie_url: selfiePhotoUrl || "",
+            kk_url: familyCardUrl || "",
+            ktp_url: ktpUrl || "",
+            sim_url: simUrl || "",
+            skck_url: skckUrl || "",
+            status: "active",
+          };
+
+          // Add vehicle information if role is Driver Mitra
+          if (
+            role === "Driver Mitra" &&
+            vehicleName &&
+            vehicleType &&
+            vehicleBrand &&
+            licensePlate
+          ) {
+            Object.assign(driverData, {
+              model: vehicleName || "",
+              type: vehicleType || "",
+              vehicle_type: vehicleType || "",
+              make: vehicleBrand || "",
+              license_plate: licensePlate || "",
+              year: vehicleYear ? Number(vehicleYear) : null,
+              color: vehicleColor || "",
+              front_image_url: vehiclePhotoUrl || "",
+            });
+          }
+
+          const { error: insertDriverError } = await supabase
+            .from("drivers")
+            .insert(driverData);
+
+          if (insertDriverError) {
+            console.error("Error inserting into drivers:", insertDriverError);
+          }
+        }
       } catch (updateError) {
         console.error("Error updating user profile:", updateError);
       }

@@ -2,6 +2,7 @@ import React from "react";
 import { UseFormRegister, FieldErrors } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface VehicleInformationFormProps {
   register: UseFormRegister<any>;
@@ -12,12 +13,13 @@ const VehicleInformationForm: React.FC<VehicleInformationFormProps> = ({
   register,
   errors,
 }) => {
+  const { t } = useLanguage();
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="vehicleName">
-            Vehicle Name <span className="text-red-500">*</span>
+            {t("vehicle.name")} <span className="text-red-500">*</span>
           </Label>
           <Input
             id="vehicleName"
@@ -36,7 +38,7 @@ const VehicleInformationForm: React.FC<VehicleInformationFormProps> = ({
 
         <div className="space-y-2">
           <Label htmlFor="vehicleType">
-            Vehicle Type <span className="text-red-500">*</span>
+            {t("vehicle.type")} <span className="text-red-500">*</span>
           </Label>
           <Input
             id="vehicleType"
@@ -57,7 +59,7 @@ const VehicleInformationForm: React.FC<VehicleInformationFormProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="vehicleBrand">
-            Vehicle Brand <span className="text-red-500">*</span>
+            {t("vehicle.brand")} <span className="text-red-500">*</span>
           </Label>
           <Input
             id="vehicleBrand"
@@ -76,7 +78,7 @@ const VehicleInformationForm: React.FC<VehicleInformationFormProps> = ({
 
         <div className="space-y-2">
           <Label htmlFor="licensePlate">
-            License Plate <span className="text-red-500">*</span>
+            {t("vehicle.licensePlate")} <span className="text-red-500">*</span>
           </Label>
           <Input
             id="licensePlate"
@@ -97,7 +99,7 @@ const VehicleInformationForm: React.FC<VehicleInformationFormProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="vehicleYear">
-            Vehicle Year <span className="text-red-500">*</span>
+            {t("vehicle.year")} <span className="text-red-500">*</span>
           </Label>
           <Input
             id="vehicleYear"
@@ -117,7 +119,7 @@ const VehicleInformationForm: React.FC<VehicleInformationFormProps> = ({
 
         <div className="space-y-2">
           <Label htmlFor="vehicleColor">
-            Vehicle Color <span className="text-red-500">*</span>
+            {t("vehicle.color")} <span className="text-red-500">*</span>
           </Label>
           <Input
             id="vehicleColor"
@@ -137,7 +139,7 @@ const VehicleInformationForm: React.FC<VehicleInformationFormProps> = ({
 
       <div className="space-y-2">
         <Label htmlFor="vehicleStatus">
-          Vehicle Status <span className="text-red-500">*</span>
+          {t("vehicle.status")} <span className="text-red-500">*</span>
         </Label>
         <Input
           id="vehicleStatus"

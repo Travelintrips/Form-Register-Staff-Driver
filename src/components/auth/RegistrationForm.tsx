@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader2, Upload } from "lucide-react";
@@ -96,6 +97,7 @@ const registrationSchema = z
 type RegistrationFormValues = z.infer<typeof registrationSchema>;
 
 const RegistrationForm = () => {
+  const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
@@ -209,7 +211,7 @@ const RegistrationForm = () => {
         throw new Error(error.message);
       }
 
-      setFormSuccess("Registration successful! Your account has been created.");
+      setFormSuccess(t("register.success"));
       reset();
       setFileUploads({
         selfiePhoto: null,
@@ -231,22 +233,15 @@ const RegistrationForm = () => {
   };
 
   return (
-    //  <div className="flex justify-center items-center min-h-screen bg-gray-50 p-2">
-    <div className="bg-gray-50">
-      <div className="pt-1 pb-2 text-center">
-        <h1 className="text-4xl font-bold text-primary">
-          Travelintrips <span className="text-yellow-500">★</span>
-        </h1>
-      </div>
-      <Card className="w-full max-w-full sm:max-w-2xl md:max-w-4xl p-2 md:p-10 rounded-2xl shadow-lg bg-white">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">
-            Create an account
-          </CardTitle>
-          <CardDescription className="text-center">
-            Enter your information to create an account
-          </CardDescription>
-        </CardHeader>
+    <div className="w-full bg-gray-50 min-h-screen px-0 py-4">
+      <div className="w-full max-w-none p-4 md:p-10 rounded-lg bg-white shadow-md">
+        <div className="text-center mb-6">
+          <h1 className="text-4xl font-bold text-primary">
+            {t("app.name")} <span className="text-yellow-500">★</span>
+          </h1>
+          <h2 className="text-2xl font-bold mt-2">{t("register.title")}</h2>
+          <p className="text-muted-foreground">{t("register.subtitle")}</p>
+        </div>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {formError && (
@@ -268,20 +263,20 @@ const RegistrationForm = () => {
             >
               <TabsList className="grid w-full grid-cols-2 mb-2">
                 <TabsTrigger id="tab-personal" value="personal">
-                  Personal
+                  {t("tabs.personal")}
                 </TabsTrigger>
                 <TabsTrigger id="tab-contact" value="contact">
-                  Contact
+                  {t("tabs.contact")}
                 </TabsTrigger>
               </TabsList>
 
               {selectedRole === "Driver Mitra" && (
                 <TabsList className="grid w-full grid-cols-2 mt-2">
                   <TabsTrigger id="tab-vehicle" value="vehicle">
-                    Vehicle
+                    {t("tabs.vehicle")}
                   </TabsTrigger>
                   <TabsTrigger id="tab-documents" value="documents">
-                    Documents
+                    {t("tabs.documents")}
                   </TabsTrigger>
                 </TabsList>
               )}
@@ -289,7 +284,7 @@ const RegistrationForm = () => {
               {selectedRole && selectedRole !== "Driver Mitra" && (
                 <TabsList className="grid w-full grid-cols-1 mt-2">
                   <TabsTrigger id="tab-documents" value="documents">
-                    Documents
+                    {t("tabs.documents")}
                   </TabsTrigger>
                 </TabsList>
               )}
@@ -297,7 +292,8 @@ const RegistrationForm = () => {
               <TabsContent value="personal" className="space-y-4 pt-4">
                 <div className="space-y-2">
                   <Label htmlFor="role">
-                    Role <span className="text-red-500">*</span>
+                    {t("role.label") || "Role"}{" "}
+                    <span className="text-red-500">*</span>
                   </Label>
                   <Select
                     onValueChange={(value) => {
@@ -321,21 +317,27 @@ const RegistrationForm = () => {
                     <SelectTrigger
                       className={errors.role ? "border-red-500" : ""}
                     >
-                      <SelectValue placeholder="Select a role" />
+                      <SelectValue placeholder={t("role.select")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Staff Admin">Staff Admin</SelectItem>
+                      <SelectItem value="Staff Admin">
+                        {t("role.staffAdmin")}
+                      </SelectItem>
 
-                      <SelectItem value="Admin">Admin</SelectItem>
+                      <SelectItem value="Admin">{t("role.admin")}</SelectItem>
 
-                      <SelectItem value="Staff Trips">Staff Trips</SelectItem>
+                      <SelectItem value="Staff Trips">
+                        {t("role.staffTrips")}
+                      </SelectItem>
                       <SelectItem value="Staff Traffick">
-                        Staff Traffick
+                        {t("role.staffTraffick")}
                       </SelectItem>
                       <SelectItem value="Driver Perusahaan">
-                        Driver Perusahaan
+                        {t("role.driverPerusahaan")}
                       </SelectItem>
-                      <SelectItem value="Driver Mitra">Driver Mitra</SelectItem>
+                      <SelectItem value="Driver Mitra">
+                        {t("role.driverMitra")}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   {errors.role && (
@@ -528,7 +530,7 @@ const RegistrationForm = () => {
                     }}
                     disabled={isLoading}
                   >
-                    Previous
+                    {t("button.previous")}
                   </Button>
                 )}
 
@@ -545,7 +547,7 @@ const RegistrationForm = () => {
                     }}
                     disabled={isLoading}
                   >
-                    Next
+                    {t("button.next")}
                   </Button>
                 )}
 
@@ -554,12 +556,12 @@ const RegistrationForm = () => {
                     {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        <span>Creating account...</span>
+                        <span>{t("register.creatingAccount")}</span>
                       </>
                     ) : (
                       <>
                         <Upload className="mr-2 h-4 w-4" />
-                        <span>Create account</span>
+                        <span>{t("register.createAccount")}</span>
                       </>
                     )}
                   </Button>
@@ -567,24 +569,26 @@ const RegistrationForm = () => {
               </div>
 
               <div className="text-center text-xs text-gray-500">
-                <span className="text-red-500">*</span> Required fields
+                <span className="text-red-500">*</span>{" "}
+                {t("common.requiredFields") || "Required fields"}
               </div>
             </div>
           </form>
         </CardContent>
         <CardFooter className="flex justify-center">
           <p className="text-sm text-gray-600">
-            Already have an account?{" "}
+            {t("auth.hasAccount")}{" "}
             <a
               href="/login"
               className="text-blue-600 hover:underline font-medium"
             >
-              Sign in
+              {t("auth.signin")}
             </a>
           </p>
         </CardFooter>
-      </Card>
+      </div>
     </div>
+    // </div>
   );
 };
 
