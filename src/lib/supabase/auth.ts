@@ -339,7 +339,9 @@ export async function registerUser({
             relative_phone: familyPhoneNumber || "",
             family_phone: familyPhoneNumber || "",
             license_number: simNumber || "",
-
+            license_expiry: simExpiryDate || null,
+            //ethnicity: ethnicity || "",
+            //  education: education || "",
             selfie_url: selfiePhotoUrl || "",
             kk_url: familyCardUrl || "",
             ktp_url: ktpUrl || "",
@@ -365,6 +367,7 @@ export async function registerUser({
               year: vehicleYear ? Number(vehicleYear) : null,
               color: vehicleColor || "",
               front_image_url: vehiclePhotoUrl || "",
+              vehicle_status: vehicleStatus || "",
             });
           }
 
