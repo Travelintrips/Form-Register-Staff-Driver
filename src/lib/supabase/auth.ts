@@ -415,7 +415,7 @@ export async function registerUser({
               religion: religion || null,
               ethnicity: ethnicity || "",
               address: ktpAddress || "",
-              relative_phone: familyPhoneNumber || "",
+              reference_phone: familyPhoneNumber || "",
               ktp_number: ktpNumber || "",
               sim_number: simNumber || "",
               selfie_url: selfiePhotoUrl || "",
