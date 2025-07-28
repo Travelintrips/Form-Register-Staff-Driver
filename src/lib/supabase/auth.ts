@@ -54,6 +54,7 @@ async function uploadFile(
   if (!file) return null;
 
   try {
+    console.log(`Uploading file: ${file.name} to ${bucket}/${folder}`);
     const fileExt = file.name.split(".").pop();
     const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
     const filePath = `${folder}/${fileName}`;
@@ -64,14 +65,15 @@ async function uploadFile(
 
     if (uploadError) {
       console.error("Error uploading file:", uploadError);
-      return null;
+      throw new Error(`File upload failed: ${uploadError.message}`);
     }
 
     const { data } = supabase.storage.from(bucket).getPublicUrl(filePath);
+    console.log(`File uploaded successfully: ${data.publicUrl}`);
     return data.publicUrl;
   } catch (error) {
     console.error("File upload error:", error);
-    return null;
+    throw error;
   }
 }
 
@@ -108,25 +110,54 @@ export async function registerUser({
   vehiclePhoto,
 }: RegisterCredentials): Promise<{ data: any; error: AuthError | null }> {
   try {
+    console.log("Starting user registration for role:", role);
+    console.log("Email:", email);
+
+    // Validate required parameters
+    if (!email || !role) {
+      console.error("Missing required fields: email or role");
+      return {
+        data: null,
+        error: new Error("Email and role are required") as AuthError,
+      };
+    }
     // Upload files to Supabase Storage
+    console.log("Starting file uploads...");
     const selfiePhotoUrl = selfiePhoto
       ? await uploadFile(selfiePhoto, "user-documents", "selfies")
       : null;
+    console.log(
+      "Selfie photo uploaded:",
+      selfiePhotoUrl ? "success" : "skipped",
+    );
+
     const familyCardUrl = familyCard
       ? await uploadFile(familyCard, "user-documents", "family-cards")
       : null;
+    console.log("Family card uploaded:", familyCardUrl ? "success" : "skipped");
+
     const ktpUrl = ktpDocument
       ? await uploadFile(ktpDocument, "user-documents", "ktp")
       : null;
+    console.log("KTP document uploaded:", ktpUrl ? "success" : "skipped");
+
     const simUrl = simDocument
       ? await uploadFile(simDocument, "user-documents", "sim")
       : null;
+    console.log("SIM document uploaded:", simUrl ? "success" : "skipped");
+
     const skckUrl = skckDocument
       ? await uploadFile(skckDocument, "user-documents", "skck")
       : null;
+    console.log("SKCK document uploaded:", skckUrl ? "success" : "skipped");
+
     const vehiclePhotoUrl = vehiclePhoto
       ? await uploadFile(vehiclePhoto, "user-documents", "vehicles")
       : null;
+    console.log(
+      "Vehicle photo uploaded:",
+      vehiclePhotoUrl ? "success" : "skipped",
+    );
 
     // Clean up the data by removing undefined values
     const userData = {
@@ -181,6 +212,10 @@ export async function registerUser({
     const timestamp = Date.now();
     const randomEmail = `user_${uuid}_${timestamp}@anonymous.user`; // 💥 Bikin email random baru
 
+    console.log("Creating user account with Supabase Auth...");
+    console.log("User data being sent to auth:", userData);
+
+    console.log("Attempting Supabase Auth signup...");
     const { data, error }: AuthResponse = await supabase.auth.signUp({
       email, // ✅ pakai email user
       password,
@@ -188,6 +223,77 @@ export async function registerUser({
         data: userData,
       },
     });
+
+    if (error) {
+      console.error("Supabase Auth signup error:", error);
+      console.error("Error details:", {
+        message: error.message,
+        status: error.status,
+        name: error.name,
+        stack: error.stack,
+      });
+      console.error("User data that was sent:", userData);
+
+      // Handle specific database errors with more detailed messages
+      if (error.message?.includes("Database error saving new user")) {
+        console.error("Database trigger error detected");
+        console.error(
+          "This indicates an issue with the handle_new_user() trigger function",
+        );
+        console.error("Possible causes:");
+        console.error("1. Trigger function doesn't have proper permissions");
+        console.error("2. RLS policies are blocking the insert");
+        console.error("3. Missing columns in the users table");
+        console.error("4. Data type mismatch in the trigger function");
+
+        return {
+          data: null,
+          error: {
+            ...error,
+            message:
+              "Registration failed due to database configuration. The system could not create your user profile. Please try again or contact support if the problem persists.",
+          } as AuthError,
+        };
+      }
+
+      // Handle other common auth errors
+      if (error.message?.includes("User already registered")) {
+        return {
+          data: null,
+          error: {
+            ...error,
+            message:
+              "An account with this email already exists. Please try logging in instead.",
+          } as AuthError,
+        };
+      }
+
+      if (error.message?.includes("Invalid email")) {
+        return {
+          data: null,
+          error: {
+            ...error,
+            message: "Please enter a valid email address.",
+          } as AuthError,
+        };
+      }
+
+      if (error.message?.includes("Password")) {
+        return {
+          data: null,
+          error: {
+            ...error,
+            message: "Password must be at least 6 characters long.",
+          } as AuthError,
+        };
+      }
+
+      return { data: null, error };
+    }
+
+    console.log("User account created successfully:", data?.user?.id);
+    console.log("User email:", data?.user?.email);
+    console.log("User metadata:", data?.user?.user_metadata);
 
     const roleMapping: Record<string, number> = {
       Admin: 1,
@@ -267,6 +373,7 @@ export async function registerUser({
         // Only update if there's data to update
         if (Object.keys(profileData).length > 0) {
           // Upsert to the public.users table directly
+          console.log("Updating user profile in database...");
           const { error: upsertError } = await supabase.from("users").upsert(
             {
               id: data.user.id,
@@ -281,7 +388,9 @@ export async function registerUser({
               "Error upserting user profile in database:",
               upsertError,
             );
+            throw new Error(`Database error: ${upsertError.message}`);
           }
+          console.log("User profile updated successfully");
         }
 
         if (
@@ -289,6 +398,7 @@ export async function registerUser({
           role === "Staff Trips" ||
           role === "Staff Traffick"
         ) {
+          console.log("Inserting staff data...");
           const { error: insertStaffError } = await supabase
             .from("staff")
             .insert({
@@ -316,7 +426,11 @@ export async function registerUser({
 
           if (insertStaffError) {
             console.error("Error inserting into staff:", insertStaffError);
+            throw new Error(
+              `Staff database error: ${insertStaffError.message}`,
+            );
           }
+          console.log("Staff data inserted successfully");
         }
 
         // Insert data into drivers table if role is Driver Mitra or Driver Perusahaan
@@ -371,13 +485,18 @@ export async function registerUser({
             });
           }
 
+          console.log("Inserting driver data...");
           const { error: insertDriverError } = await supabase
             .from("drivers")
             .insert(driverData);
 
           if (insertDriverError) {
             console.error("Error inserting into drivers:", insertDriverError);
+            throw new Error(
+              `Driver database error: ${insertDriverError.message}`,
+            );
           }
+          console.log("Driver data inserted successfully");
         }
       } catch (updateError) {
         console.error("Error updating user profile:", updateError);

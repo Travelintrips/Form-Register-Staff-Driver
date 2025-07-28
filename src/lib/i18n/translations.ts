@@ -147,7 +147,7 @@ export const translations: Translations = {
     id: "Nomor Telepon Keluarga",
   },
   "form.ktpAddress": {
-    en: "KTP Address",
+    en: "KTP Address1",
     id: "Alamat KTP",
   },
   "form.ktpNumber": {

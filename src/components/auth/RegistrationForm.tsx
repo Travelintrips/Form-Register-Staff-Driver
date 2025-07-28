@@ -171,6 +171,29 @@ const RegistrationForm = () => {
     setFormSuccess(null);
 
     try {
+      console.log("Starting registration process...");
+      console.log("Form data:", {
+        email: data.email,
+        role: data.role,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        fullName: data.fullName,
+        phoneNumber: data.phoneNumber,
+      });
+      console.log("File uploads:", {
+        selfiePhoto: fileUploads.selfiePhoto?.name,
+        familyCard: fileUploads.familyCard?.name,
+        ktpDocument: fileUploads.ktpDocument?.name,
+        simDocument: fileUploads.simDocument?.name,
+        skckDocument: fileUploads.skckDocument?.name,
+        vehiclePhoto: fileUploads.vehiclePhoto?.name,
+      });
+
+      // Validate required fields based on role
+      if (!data.email || !data.password || !data.role) {
+        throw new Error("Email, password, and role are required");
+      }
+
       // Call Supabase auth service
       const { data: userData, error } = await registerUser({
         email: data.email,
@@ -208,10 +231,33 @@ const RegistrationForm = () => {
       });
 
       if (error) {
-        throw new Error(error.message);
+        console.error("Registration error:", error);
+        let errorMessage = "Database error saving new user";
+
+        if (error.message) {
+          errorMessage = error.message;
+        }
+
+        // Handle specific error types
+        if (error.message?.includes("duplicate key")) {
+          errorMessage = "An account with this email already exists";
+        } else if (error.message?.includes("invalid email")) {
+          errorMessage = "Please enter a valid email address";
+        } else if (error.message?.includes("weak password")) {
+          errorMessage =
+            "Password is too weak. Please use at least 6 characters";
+        } else if (error.message?.includes("network")) {
+          errorMessage =
+            "Network error. Please check your internet connection and try again";
+        } else if (error.message?.includes("storage")) {
+          errorMessage = "Error uploading files. Please try again";
+        }
+
+        throw new Error(errorMessage);
       }
 
-      setFormSuccess(t("register.success"));
+      console.log("Registration successful:", userData);
+      setFormSuccess("Account created successfully! You can now login.");
       reset();
       setFileUploads({
         selfiePhoto: null,
@@ -222,11 +268,12 @@ const RegistrationForm = () => {
         vehiclePhoto: null,
       });
     } catch (error) {
-      setFormError(
+      console.error("Form submission error:", error);
+      const errorMessage =
         error instanceof Error
           ? error.message
-          : "An error occurred during registration",
-      );
+          : "An unexpected error occurred during registration. Please try again.";
+      setFormError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -373,6 +420,7 @@ const RegistrationForm = () => {
                         id="selfiePhoto"
                         type="file"
                         accept="image/*"
+                        capture="user"
                         onChange={(e) => handleFileChange(e, "selfiePhoto")}
                         className={errors.selfiePhoto ? "border-red-500" : ""}
                       />
@@ -396,6 +444,7 @@ const RegistrationForm = () => {
                         id="familyCard"
                         type="file"
                         accept="image/*,.pdf"
+                        capture="environment"
                         onChange={(e) => handleFileChange(e, "familyCard")}
                         className={errors.familyCard ? "border-red-500" : ""}
                       />
@@ -419,6 +468,7 @@ const RegistrationForm = () => {
                         id="ktpDocument"
                         type="file"
                         accept="image/*,.pdf"
+                        capture="environment"
                         onChange={(e) => handleFileChange(e, "ktpDocument")}
                         className={errors.ktpDocument ? "border-red-500" : ""}
                       />
@@ -435,31 +485,29 @@ const RegistrationForm = () => {
                     )}
                   </div>
 
-                  {(selectedRole === "Driver Perusahaan" ||
-                    selectedRole === "Driver Mitra") && (
-                    <div className="space-y-2">
-                      <Label htmlFor="simDocument">SIM</Label>
-                      <div className="flex items-center gap-2">
-                        <Input
-                          id="simDocument"
-                          type="file"
-                          accept="image/*,.pdf"
-                          onChange={(e) => handleFileChange(e, "simDocument")}
-                          className={errors.simDocument ? "border-red-500" : ""}
-                        />
-                        {fileUploads.simDocument && (
-                          <span className="text-sm text-green-600">
-                            ✓ {fileUploads.simDocument.name}
-                          </span>
-                        )}
-                      </div>
-                      {errors.simDocument && (
-                        <p className="text-sm text-red-500">
-                          {errors.simDocument.message as string}
-                        </p>
+                  <div className="space-y-2">
+                    <Label htmlFor="simDocument">SIM</Label>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        id="simDocument"
+                        type="file"
+                        accept="image/*,.pdf"
+                        capture="environment"
+                        onChange={(e) => handleFileChange(e, "simDocument")}
+                        className={errors.simDocument ? "border-red-500" : ""}
+                      />
+                      {fileUploads.simDocument && (
+                        <span className="text-sm text-green-600">
+                          ✓ {fileUploads.simDocument.name}
+                        </span>
                       )}
                     </div>
-                  )}
+                    {errors.simDocument && (
+                      <p className="text-sm text-red-500">
+                        {errors.simDocument.message as string}
+                      </p>
+                    )}
+                  </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="skckDocument">SKCK Document</Label>
@@ -468,6 +516,7 @@ const RegistrationForm = () => {
                         id="skckDocument"
                         type="file"
                         accept="image/*,.pdf"
+                        capture="environment"
                         onChange={(e) => handleFileChange(e, "skckDocument")}
                         className={errors.skckDocument ? "border-red-500" : ""}
                       />
@@ -492,6 +541,7 @@ const RegistrationForm = () => {
                           id="vehiclePhoto"
                           type="file"
                           accept="image/*"
+                          capture="environment"
                           onChange={(e) => handleFileChange(e, "vehiclePhoto")}
                           className={
                             errors.vehiclePhoto ? "border-red-500" : ""
