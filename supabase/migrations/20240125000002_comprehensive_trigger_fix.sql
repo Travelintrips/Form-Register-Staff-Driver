@@ -1,6 +1,8 @@
 -- Drop the existing trigger and function to recreate them properly
+-- Drop trigger first, then function to avoid dependency issues
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-DROP FUNCTION IF EXISTS public.handle_new_user();
+DROP TRIGGER IF EXISTS after_user_signup ON auth.users;
+DROP FUNCTION IF EXISTS public.handle_new_user() CASCADE;
 
 -- Disable RLS temporarily to allow the trigger function to work
 ALTER TABLE public.users DISABLE ROW LEVEL SECURITY;
@@ -13,7 +15,6 @@ BEGIN
   INSERT INTO public.users (
     id, 
     email, 
-    username,
     role,
     first_name,
     last_name,
@@ -44,8 +45,7 @@ BEGIN
   )
   VALUES (
     NEW.id,
-    NEW.email,
-    COALESCE(NEW.raw_user_meta_data->>'username', ''),
+    COALESCE(NEW.email, NEW.raw_user_meta_data->>'email'),
     COALESCE(NEW.raw_user_meta_data->>'role', ''),
     COALESCE(NEW.raw_user_meta_data->>'first_name', ''),
     COALESCE(NEW.raw_user_meta_data->>'last_name', ''),
@@ -87,8 +87,7 @@ BEGIN
     END
   )
   ON CONFLICT (id) DO UPDATE SET
-    email = EXCLUDED.email,
-    username = EXCLUDED.username,
+    email = COALESCE(EXCLUDED.email, public.users.email),
     role = EXCLUDED.role,
     first_name = EXCLUDED.first_name,
     last_name = EXCLUDED.last_name,

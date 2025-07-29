@@ -363,6 +363,33 @@ export type Database = {
           },
         ]
       }
+      auth_error_logs: {
+        Row: {
+          email: string | null
+          error_message: string | null
+          error_time: string | null
+          id: number
+          raw_user_meta_data: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          email?: string | null
+          error_message?: string | null
+          error_time?: string | null
+          id?: never
+          raw_user_meta_data?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          email?: string | null
+          error_message?: string | null
+          error_time?: string | null
+          id?: never
+          raw_user_meta_data?: Json | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       baggage_booking: {
         Row: {
           airport: string
@@ -593,6 +620,7 @@ export type Database = {
           driver_id: string | null
           driver_name: string | null
           driver_option: string | null
+          drivers_id: string | null
           duration: number | null
           end_date: string | null
           id: string
@@ -601,6 +629,7 @@ export type Database = {
           license_plate: string | null
           make: string | null
           model: string | null
+          name: string | null
           notes: string | null
           overdue: number | null
           paid_amount: number | null
@@ -613,6 +642,7 @@ export type Database = {
           price: number | null
           quantity: number | null
           reference_number: string | null
+          remaining_payment: number | null
           remaining_payments: number | null
           return_time: string | null
           role_id: number | null
@@ -642,6 +672,7 @@ export type Database = {
           driver_id?: string | null
           driver_name?: string | null
           driver_option?: string | null
+          drivers_id?: string | null
           duration?: number | null
           end_date?: string | null
           id?: string
@@ -650,6 +681,7 @@ export type Database = {
           license_plate?: string | null
           make?: string | null
           model?: string | null
+          name?: string | null
           notes?: string | null
           overdue?: number | null
           paid_amount?: number | null
@@ -662,6 +694,7 @@ export type Database = {
           price?: number | null
           quantity?: number | null
           reference_number?: string | null
+          remaining_payment?: number | null
           remaining_payments?: number | null
           return_time?: string | null
           role_id?: number | null
@@ -691,6 +724,7 @@ export type Database = {
           driver_id?: string | null
           driver_name?: string | null
           driver_option?: string | null
+          drivers_id?: string | null
           duration?: number | null
           end_date?: string | null
           id?: string
@@ -699,6 +733,7 @@ export type Database = {
           license_plate?: string | null
           make?: string | null
           model?: string | null
+          name?: string | null
           notes?: string | null
           overdue?: number | null
           paid_amount?: number | null
@@ -711,6 +746,7 @@ export type Database = {
           price?: number | null
           quantity?: number | null
           reference_number?: string | null
+          remaining_payment?: number | null
           remaining_payments?: number | null
           return_time?: string | null
           role_id?: number | null
@@ -3275,6 +3311,7 @@ export type Database = {
           booking_ids: string | null
           bookings_status: string | null
           created_at: string | null
+          driver_id: string | null
           due_date: string | null
           id: string
           is_damage_payment: boolean | null
@@ -3310,6 +3347,7 @@ export type Database = {
           booking_ids?: string | null
           bookings_status?: string | null
           created_at?: string | null
+          driver_id?: string | null
           due_date?: string | null
           id?: string
           is_damage_payment?: boolean | null
@@ -3345,6 +3383,7 @@ export type Database = {
           booking_ids?: string | null
           bookings_status?: string | null
           created_at?: string | null
+          driver_id?: string | null
           due_date?: string | null
           id?: string
           is_damage_payment?: boolean | null
@@ -3870,6 +3909,7 @@ export type Database = {
           email: string
           employee_id: string | null
           ethnicity: string | null
+          family_phone_number: string | null
           first_name: string | null
           full_name: string | null
           id: string
@@ -3882,7 +3922,6 @@ export type Database = {
           nickname: string | null
           phone: string
           position: string | null
-          reference_phone: string | null
           religion: string | null
           role: string | null
           role_id: number | null
@@ -3903,6 +3942,7 @@ export type Database = {
           email: string
           employee_id?: string | null
           ethnicity?: string | null
+          family_phone_number?: string | null
           first_name?: string | null
           full_name?: string | null
           id: string
@@ -3915,7 +3955,6 @@ export type Database = {
           nickname?: string | null
           phone: string
           position?: string | null
-          reference_phone?: string | null
           religion?: string | null
           role?: string | null
           role_id?: number | null
@@ -3936,6 +3975,7 @@ export type Database = {
           email?: string
           employee_id?: string | null
           ethnicity?: string | null
+          family_phone_number?: string | null
           first_name?: string | null
           full_name?: string | null
           id?: string
@@ -3948,7 +3988,6 @@ export type Database = {
           nickname?: string | null
           phone?: string
           position?: string | null
-          reference_phone?: string | null
           religion?: string | null
           role?: string | null
           role_id?: number | null
@@ -4072,13 +4111,10 @@ export type Database = {
       }
       users: {
         Row: {
-          address: string | null
-          alamat: string | null
           birth_date: string | null
           birth_place: string | null
           created_at: string | null
           cv_url: string | null
-          date_of_birth: string | null
           department: string | null
           driver_type: string | null
           education: string | null
@@ -4104,7 +4140,6 @@ export type Database = {
           license_rate: number | null
           phone: string | null
           phone_number: string | null
-          place_of_birth: string | null
           position: string | null
           reference_phone: string | null
           religion: string | null
@@ -4119,11 +4154,8 @@ export type Database = {
           skck_url: string | null
           status: string | null
           stnk_url: string | null
-          tanggal_lahir: string | null
-          tempat_lahir: string | null
           transmission: string | null
           updated_at: string | null
-          username: string | null
           vehicle_brand: string | null
           vehicle_category: string | null
           vehicle_color: string | null
@@ -4135,13 +4167,10 @@ export type Database = {
           vehicle_year: string | null
         }
         Insert: {
-          address?: string | null
-          alamat?: string | null
           birth_date?: string | null
           birth_place?: string | null
           created_at?: string | null
           cv_url?: string | null
-          date_of_birth?: string | null
           department?: string | null
           driver_type?: string | null
           education?: string | null
@@ -4167,7 +4196,6 @@ export type Database = {
           license_rate?: number | null
           phone?: string | null
           phone_number?: string | null
-          place_of_birth?: string | null
           position?: string | null
           reference_phone?: string | null
           religion?: string | null
@@ -4182,11 +4210,8 @@ export type Database = {
           skck_url?: string | null
           status?: string | null
           stnk_url?: string | null
-          tanggal_lahir?: string | null
-          tempat_lahir?: string | null
           transmission?: string | null
           updated_at?: string | null
-          username?: string | null
           vehicle_brand?: string | null
           vehicle_category?: string | null
           vehicle_color?: string | null
@@ -4198,13 +4223,10 @@ export type Database = {
           vehicle_year?: string | null
         }
         Update: {
-          address?: string | null
-          alamat?: string | null
           birth_date?: string | null
           birth_place?: string | null
           created_at?: string | null
           cv_url?: string | null
-          date_of_birth?: string | null
           department?: string | null
           driver_type?: string | null
           education?: string | null
@@ -4230,7 +4252,6 @@ export type Database = {
           license_rate?: number | null
           phone?: string | null
           phone_number?: string | null
-          place_of_birth?: string | null
           position?: string | null
           reference_phone?: string | null
           religion?: string | null
@@ -4245,11 +4266,8 @@ export type Database = {
           skck_url?: string | null
           status?: string | null
           stnk_url?: string | null
-          tanggal_lahir?: string | null
-          tempat_lahir?: string | null
           transmission?: string | null
           updated_at?: string | null
-          username?: string | null
           vehicle_brand?: string | null
           vehicle_category?: string | null
           vehicle_color?: string | null

@@ -196,7 +196,7 @@ export async function registerUser({
       }
     });
 
-    // Use the password provided by the user, but generate a random email
+    // Use the password provided by the user
     const { password } = arguments[0];
 
     if (!password) {
@@ -206,21 +206,19 @@ export async function registerUser({
       };
     }
 
-    const uuid = crypto.randomUUID
-      ? crypto.randomUUID()
-      : `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
-    const timestamp = Date.now();
-    const randomEmail = `user_${uuid}_${timestamp}@anonymous.user`; // 💥 Bikin email random baru
-
     console.log("Creating user account with Supabase Auth...");
     console.log("User data being sent to auth:", userData);
+    console.log("Email being used:", email);
 
     console.log("Attempting Supabase Auth signup...");
     const { data, error }: AuthResponse = await supabase.auth.signUp({
-      email, // ✅ pakai email user
+      email,
       password,
       options: {
-        data: userData,
+        data: {
+          ...userData,
+          email: email, // Explicitly include email in metadata
+        },
       },
     });
 
@@ -415,7 +413,7 @@ export async function registerUser({
               religion: religion || null,
               ethnicity: ethnicity || "",
               address: ktpAddress || "",
-              reference_phone: reference_phone || "",
+              family_phone_number: familyPhoneNumber || "",
               ktp_number: ktpNumber || "",
               sim_number: simNumber || "",
               selfie_url: selfiePhotoUrl || "",
@@ -450,8 +448,7 @@ export async function registerUser({
             ktp_address: ktpAddress || "",
             address: ktpAddress || "",
             ktp_number: ktpNumber || "",
-            reference_phone: familyPhoneNumber || "",
-            family_phone: familyPhoneNumber || "",
+            family_phone_number: familyPhoneNumber || "",
             license_number: simNumber || "",
             license_expiry: simExpiryDate || null,
             //ethnicity: ethnicity || "",
