@@ -18,8 +18,8 @@ interface RegisterCredentials {
   phoneNumber?: string;
   familyPhoneNumber?: string;
   ktpNumber?: string;
-  simNumber?: string;
-  simExpiryDate?: string;
+  licenseNumber?: string;
+  licenseExpiry?: string;
   religion?: string;
   ethnicity?: string;
   education?: string;
@@ -90,8 +90,8 @@ export async function registerUser({
   phoneNumber,
   familyPhoneNumber,
   ktpNumber,
-  simNumber,
-  simExpiryDate,
+  licenseNumber,
+  licenseExpiry,
   religion,
   ethnicity,
   education,
@@ -169,8 +169,8 @@ export async function registerUser({
       phone_number: phoneNumber || null,
       family_phone_number: familyPhoneNumber || null,
       ktp_number: ktpNumber || null,
-      sim_number: simNumber || null,
-      sim_expiry_date: simExpiryDate || null,
+      license_number: licenseNumber || null,
+      license_expiry: licenseExpiry || null,
       religion: religion || null,
       ethnicity: ethnicity || null,
       education: education || null,
@@ -321,8 +321,8 @@ export async function registerUser({
           phone_number?: string;
           family_phone_number?: string;
           ktp_number?: string;
-          sim_number?: string;
-          sim_expiry_date?: string;
+          license_number?: string;
+          license_expiry?: string;
           religion?: string;
           ethnicity?: string;
           education?: string;
@@ -350,8 +350,8 @@ export async function registerUser({
         if (familyPhoneNumber)
           profileData.family_phone_number = familyPhoneNumber;
         if (ktpNumber) profileData.ktp_number = ktpNumber;
-        if (simNumber) profileData.sim_number = simNumber;
-        if (simExpiryDate) profileData.sim_expiry_date = simExpiryDate;
+        if (licenseNumber) profileData.license_number = licenseNumber;
+        if (licenseExpiry) profileData.license_expiry = licenseExpiry;
         if (religion) profileData.religion = religion;
         if (ethnicity) profileData.ethnicity = ethnicity;
         if (education) profileData.education = education;
@@ -416,7 +416,7 @@ export async function registerUser({
               address: ktpAddress || "",
               family_phone_number: familyPhoneNumber || "",
               ktp_number: ktpNumber || "",
-              sim_number: simNumber || "",
+              license_number: licenseNumber || "",
               selfie_url: selfiePhotoUrl || "",
               kk_url: familyCardUrl || "",
               ktp_url: ktpUrl || "",
@@ -438,7 +438,6 @@ export async function registerUser({
             id: data.user.id,
             name: fullName || "",
             email: email || "",
-            phone: phoneNumber || "",
             phone_number: phoneNumber ? Number(phoneNumber) : null,
             full_name: fullName || "",
             first_name: firstName || "",
@@ -450,10 +449,8 @@ export async function registerUser({
             address: ktpAddress || "",
             ktp_number: ktpNumber || "",
             family_phone_number: familyPhoneNumber || "",
-            license_number: simNumber || "",
-            license_expiry: simExpiryDate || null,
-            //ethnicity: ethnicity || "",
-            //  education: education || "",
+            license_number: licenseNumber || "",
+            license_expiry: licenseExpiry || null,
             selfie_url: selfiePhotoUrl || "",
             kk_url: familyCardUrl || "",
             ktp_url: ktpUrl || "",

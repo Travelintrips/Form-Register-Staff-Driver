@@ -59,8 +59,8 @@ BEGIN
       phone_number,
       family_phone_number,
       ktp_number,
-      sim_number,
-      sim_expiry_date,
+      license_number,
+      license_expiry,
       religion,
       ethnicity,
       education,
@@ -90,10 +90,10 @@ BEGIN
       COALESCE(NEW.raw_user_meta_data->>'phone_number', ''),
       COALESCE(NEW.raw_user_meta_data->>'family_phone_number', ''),
       COALESCE(NEW.raw_user_meta_data->>'ktp_number', ''),
-      COALESCE(NEW.raw_user_meta_data->>'sim_number', ''),
+      COALESCE(NEW.raw_user_meta_data->>'license_number', ''),
       CASE 
-        WHEN NEW.raw_user_meta_data->>'sim_expiry_date' IS NOT NULL AND NEW.raw_user_meta_data->>'sim_expiry_date' != ''
-        THEN (NEW.raw_user_meta_data->>'sim_expiry_date')::DATE
+        WHEN NEW.raw_user_meta_data->>'license_expiry' IS NOT NULL AND NEW.raw_user_meta_data->>'license_expiry' != ''
+        THEN (NEW.raw_user_meta_data->>'license_expiry')::DATE
         ELSE NULL
       END,
       COALESCE(NEW.raw_user_meta_data->>'religion', ''),
@@ -132,8 +132,8 @@ BEGIN
       phone_number = EXCLUDED.phone_number,
       family_phone_number = EXCLUDED.family_phone_number,
       ktp_number = EXCLUDED.ktp_number,
-      sim_number = EXCLUDED.sim_number,
-      sim_expiry_date = EXCLUDED.sim_expiry_date,
+      license_number = EXCLUDED.license_number,
+      license_expiry = EXCLUDED.license_expiry,
       religion = EXCLUDED.religion,
       ethnicity = EXCLUDED.ethnicity,
       education = EXCLUDED.education,

@@ -49,31 +49,31 @@ const ContactInformationForm: React.FC<ContactInformationFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="simNumber">{t("form.simNumber")}</Label>
+        <Label htmlFor="licenseNumber">{t("form.licenseNumber")}</Label>
         <Input
-          id="simNumber"
+          id="licenseNumber"
           placeholder="SIM Number"
-          {...register("simNumber")}
-          className={errors.simNumber ? "border-red-500" : ""}
+          {...register("licenseNumber")}
+          className={errors.licenseNumber ? "border-red-500" : ""}
         />
-        {errors.simNumber && (
+        {errors.licenseNumber && (
           <p className="text-sm text-red-500">
-            {errors.simNumber.message as string}
+            {errors.licenseNumber.message as string}
           </p>
         )}
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="simExpiryDate">{t("form.simExpiryDate")}</Label>
+        <Label htmlFor="licenseExpiry">{t("form.licenseExpiry")}</Label>
         <Input
-          id="simExpiryDate"
+          id="licenseExpiry"
           type="date"
-          {...register("simExpiryDate")}
-          className={errors.simExpiryDate ? "border-red-500" : ""}
+          {...register("licenseExpiry")}
+          className={errors.licenseExpiry ? "border-red-500" : ""}
         />
-        {errors.simExpiryDate && (
+        {errors.licenseExpiry && (
           <p className="text-sm text-red-500">
-            {errors.simExpiryDate.message as string}
+            {errors.licenseExpiry.message as string}
           </p>
         )}
       </div>

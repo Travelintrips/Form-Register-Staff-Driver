@@ -154,12 +154,12 @@ export const translations: Translations = {
     en: "KTP Number",
     id: "Nomor KTP",
   },
-  "form.simNumber": {
-    en: "SIM Number",
+  "form.licenseNumber": {
+    en: "Licence Number",
     id: "Nomor SIM",
   },
-  "form.simExpiryDate": {
-    en: "SIM Expiry Date",
+  "form.licenseExpiry": {
+    en: "SIM/License Expiry Date",
     id: "Tanggal Kadaluarsa SIM",
   },
   "form.religion": {
