@@ -211,13 +211,14 @@ export async function registerUser({
     console.log("Email being used:", email);
 
     console.log("Attempting Supabase Auth signup...");
+    console.log("Email being passed to signUp:", email);
     const { data, error }: AuthResponse = await supabase.auth.signUp({
-      email,
-      password,
+      email: email,
+      password: password,
       options: {
         data: {
+          email: email, // Explicitly include email in metadata first
           ...userData,
-          email: email, // Explicitly include email in metadata
         },
       },
     });

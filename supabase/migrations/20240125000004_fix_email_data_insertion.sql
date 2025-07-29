@@ -20,11 +20,11 @@ BEGIN
   RAISE LOG 'User metadata: %', NEW.raw_user_meta_data;
   
   -- Get email from NEW.email first, then fallback to metadata
-  user_email := COALESCE(
-    NULLIF(NEW.email, ''),
-    NULLIF(NEW.raw_user_meta_data->>'email', ''),
-    NEW.email
-  );
+  user_email := CASE
+    WHEN NEW.email IS NOT NULL AND NEW.email != '' THEN NEW.email
+    WHEN NEW.raw_user_meta_data->>'email' IS NOT NULL AND NEW.raw_user_meta_data->>'email' != '' THEN NEW.raw_user_meta_data->>'email'
+    ELSE NEW.email
+  END;
   
   RAISE LOG 'Final email to be inserted: %', user_email;
   
@@ -119,11 +119,11 @@ BEGIN
       role_mapping
     )
     ON CONFLICT (id) DO UPDATE SET
-      email = COALESCE(
-        NULLIF(EXCLUDED.email, ''),
-        NULLIF(users.email, ''),
-        EXCLUDED.email
-      ),
+      email = CASE
+        WHEN EXCLUDED.email IS NOT NULL AND EXCLUDED.email != '' THEN EXCLUDED.email
+        WHEN users.email IS NOT NULL AND users.email != '' THEN users.email
+        ELSE EXCLUDED.email
+      END,
       role = EXCLUDED.role,
       first_name = EXCLUDED.first_name,
       last_name = EXCLUDED.last_name,
@@ -179,6 +179,7 @@ CREATE TRIGGER on_auth_user_created
   EXECUTE FUNCTION public.handle_new_user();
 
 -- Update existing NULL email records with email from auth.users
+-- Only update if the email doesn't already exist in the users table
 DO $
 BEGIN
   UPDATE public.users 
@@ -188,7 +189,12 @@ BEGIN
   WHERE public.users.id = auth_users.id 
     AND (public.users.email IS NULL OR public.users.email = '')
     AND auth_users.email IS NOT NULL 
-    AND auth_users.email != '';
+    AND auth_users.email != ''
+    AND NOT EXISTS (
+      SELECT 1 FROM public.users existing_users 
+      WHERE existing_users.email = auth_users.email 
+        AND existing_users.id != public.users.id
+    );
   
   RAISE LOG 'Updated existing NULL email records in users table';
 END
