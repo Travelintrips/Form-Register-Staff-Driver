@@ -395,7 +395,7 @@ export async function registerUser({
         if (
           role === "Staff Admin" ||
           role === "Staff Trips" ||
-          role === "Staff Traffick"
+          role === "Staff Traffic"
         ) {
           console.log("Inserting staff data...");
           const { error: insertStaffError } = await supabase
