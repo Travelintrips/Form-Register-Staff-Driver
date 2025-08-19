@@ -376,8 +376,8 @@ const RegistrationForm = () => {
                       <SelectItem value="Staff Trips">
                         {t("role.staffTrips")}
                       </SelectItem>
-                      <SelectItem value="Staff Traffick">
-                        {t("role.staffTraffick")}
+                      <SelectItem value="Staff Traffic">
+                        {t("role.staffTraffic")}
                       </SelectItem>
                       <SelectItem value="Driver Perusahaan">
                         {t("role.driverPerusahaan")}
