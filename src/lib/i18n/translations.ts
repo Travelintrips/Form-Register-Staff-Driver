@@ -297,7 +297,7 @@ export const translations: Translations = {
     en: "Staff Trips",
     id: "Staf Perjalanan",
   },
-  "role.staffTraffick": {
+  "role.staffTraffic": {
     en: "Staff Traffic",
     id: "Staf Lalu Lintas",
   },
