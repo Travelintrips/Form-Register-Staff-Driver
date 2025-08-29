@@ -367,11 +367,11 @@ const RegistrationForm = () => {
                       <SelectValue placeholder={t("role.select")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Staff Admin">
+                      {/*  <SelectItem value="Staff Admin">
                         {t("role.staffAdmin")}
                       </SelectItem>
 
-                      <SelectItem value="Admin">{t("role.admin")}</SelectItem>
+                      <SelectItem value="Admin">{t("role.admin")}</SelectItem> */}
 
                       <SelectItem value="Staff Trips">
                         {t("role.staffTrips")}

@@ -5,8 +5,8 @@ import "./index.css";
 import { BrowserRouter } from "react-router-dom";
 import { LanguageProvider } from "./lib/i18n/LanguageContext";
 
-import { TempoDevtools } from "tempo-devtools";
-TempoDevtools.init();
+/* import { TempoDevtools } from 'tempo-devtools'; [deprecated] */
+/* TempoDevtools.init() [deprecated] */;
 
 const basename = import.meta.env.BASE_URL;
 
