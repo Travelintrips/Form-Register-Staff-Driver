@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2, Upload } from "lucide-react";
+import { Loader2, Upload, CheckCircle2, ArrowLeft } from "lucide-react";
 import { registerUser } from "@/lib/supabase/auth";
 
 import { Button } from "@/components/ui/button";
@@ -101,6 +101,8 @@ const RegistrationForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
+  const [registrationComplete, setRegistrationComplete] = useState(false);
+  const [registeredUserRole, setRegisteredUserRole] = useState<string | null>(null);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [currentTab, setCurrentTab] = useState("personal");
   const [tabsSequence, setTabsSequence] = useState<string[]>([
@@ -171,24 +173,6 @@ const RegistrationForm = () => {
     setFormSuccess(null);
 
     try {
-      console.log("Starting registration process...");
-      console.log("Form data:", {
-        email: data.email,
-        role: data.role,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        fullName: data.fullName,
-        phoneNumber: data.phoneNumber,
-      });
-      console.log("File uploads:", {
-        selfiePhoto: fileUploads.selfiePhoto?.name,
-        familyCard: fileUploads.familyCard?.name,
-        ktpDocument: fileUploads.ktpDocument?.name,
-        simDocument: fileUploads.simDocument?.name,
-        skckDocument: fileUploads.skckDocument?.name,
-        vehiclePhoto: fileUploads.vehiclePhoto?.name,
-      });
-
       // Validate required fields based on role
       if (!data.email || !data.password || !data.role) {
         throw new Error("Email, password, and role are required");
@@ -211,13 +195,11 @@ const RegistrationForm = () => {
         religion: data.religion,
         ethnicity: data.ethnicity,
         education: data.education,
-        // File uploads
         selfiePhoto: fileUploads.selfiePhoto,
         familyCard: fileUploads.familyCard,
         ktpDocument: fileUploads.ktpDocument,
         simDocument: fileUploads.simDocument,
         skckDocument: fileUploads.skckDocument,
-        // Only include vehicle data if role is Driver Mitra
         ...(data.role === "Driver Mitra" && {
           vehicleName: data.vehicleName,
           vehicleType: data.vehicleType,
@@ -231,14 +213,12 @@ const RegistrationForm = () => {
       });
 
       if (error) {
-        console.error("Registration error:", error);
         let errorMessage = "Database error saving new user";
 
         if (error.message) {
           errorMessage = error.message;
         }
 
-        // Handle specific error types
         if (error.message?.includes("duplicate key")) {
           errorMessage = "An account with this email already exists";
         } else if (error.message?.includes("invalid email")) {
@@ -256,19 +236,11 @@ const RegistrationForm = () => {
         throw new Error(errorMessage);
       }
 
-      console.log("Registration successful:", userData);
-      setFormSuccess("Account created successfully! You can now login.");
-      reset();
-      setFileUploads({
-        selfiePhoto: null,
-        familyCard: null,
-        ktpDocument: null,
-        simDocument: null,
-        skckDocument: null,
-        vehiclePhoto: null,
-      });
+      // Set success state and show success page
+      setRegisteredUserRole(data.role);
+      setRegistrationComplete(true);
+      setFormSuccess("Account created successfully!");
     } catch (error) {
-      console.error("Form submission error:", error);
       const errorMessage =
         error instanceof Error
           ? error.message
@@ -278,6 +250,114 @@ const RegistrationForm = () => {
       setIsLoading(false);
     }
   };
+
+  const handleBackToRegistration = () => {
+    setRegistrationComplete(false);
+    setRegisteredUserRole(null);
+    setFormSuccess(null);
+    setFormError(null);
+    reset();
+    setFileUploads({
+      selfiePhoto: null,
+      familyCard: null,
+      ktpDocument: null,
+      simDocument: null,
+      skckDocument: null,
+      vehiclePhoto: null,
+    });
+    setSelectedRole(null);
+    setCurrentTab("personal");
+  };
+
+  // Success page component
+  if (registrationComplete) {
+    const isDriver = registeredUserRole?.includes("Driver");
+    const isStaff = registeredUserRole?.includes("Staff");
+
+    return (
+      <div className="w-full bg-gray-50 min-h-screen px-0 py-4">
+        <div className="w-full max-w-4xl mx-auto p-4 md:p-10 rounded-lg bg-white shadow-md">
+          <div className="text-center mb-8">
+            <div className="flex justify-center mb-4">
+              <CheckCircle2 className="w-20 h-20 text-green-500" />
+            </div>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+              Thank You For Registering!
+            </h1>
+            <p className="text-lg text-gray-600">
+              Your account has been successfully created
+            </p>
+          </div>
+
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold text-center mb-6">
+              Please Sign In - Choose Your Role
+            </h2>
+            
+            <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+              {/* Driver Card */}
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer border-2 hover:border-blue-500">
+                <CardHeader>
+                  <CardTitle className="text-center text-xl">
+                    Driver Account
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-center space-y-4">
+                  <p className="text-gray-600">
+                    Sign in to your Driver Account
+                  </p>
+                  <Button
+                    className="w-full"
+                    size="lg"
+                    onClick={() => {
+                      window.location.href = "https://driver.travelinairport.com/";
+                    }}
+                  >
+                    Sign In as Driver
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Staff Card */}
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer border-2 hover:border-green-500">
+                <CardHeader>
+                  <CardTitle className="text-center text-xl">
+                    Staff Account
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-center space-y-4">
+                  <p className="text-gray-600">
+                    Sign in to your Staff Account
+                  </p>
+                  <Button
+                    className="w-full"
+                    size="lg"
+                    variant="secondary"
+                    onClick={() => {
+                      window.location.href = "https://www.travelinairport.com/";
+                    }}
+                  >
+                    Sign In as Staff
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <Button
+              variant="outline"
+              onClick={handleBackToRegistration}
+              className="gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Registration Form
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full bg-gray-50 min-h-screen px-0 py-4">
@@ -638,7 +718,6 @@ const RegistrationForm = () => {
         </CardFooter>
       </div>
     </div>
-    // </div>
   );
 };
 
