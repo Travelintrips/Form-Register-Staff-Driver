@@ -217,7 +217,7 @@ export async function registerUser({
       password: password,
       options: {
         data: {
-          email: email, // Explicitly include email in metadata first
+          email: email, // Explicitly include email in metadata
           ...userData,
         },
       },
