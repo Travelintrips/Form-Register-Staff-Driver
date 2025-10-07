@@ -86,7 +86,7 @@ const LoginForm = () => {
 
   return (
     <Card className="w-full max-w-md p-6 rounded-xl shadow-lg bg-white">
-      <CardHeader className="space-y-1">
+      {/* <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold text-center">
           {t("auth.signin.title") || "Sign in to your account"}
         </CardTitle>
@@ -94,7 +94,7 @@ const LoginForm = () => {
           {t("auth.signin.subtitle") ||
             "Enter your email and password to sign in"}
         </CardDescription>
-      </CardHeader>
+      </CardHeader>*/}
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {formError && (
@@ -149,7 +149,7 @@ const LoginForm = () => {
             )}
           </div>
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          {/*   <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -161,7 +161,7 @@ const LoginForm = () => {
                 <span>{t("auth.signin")}</span>
               </>
             )}
-          </Button>
+          </Button>*/}
         </form>
       </CardContent>
       <CardFooter className="flex justify-center">

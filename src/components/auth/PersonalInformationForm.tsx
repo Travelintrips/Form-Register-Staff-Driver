@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { UseFormRegister, FieldErrors } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Eye, EyeOff } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -14,7 +16,7 @@ import { useLanguage } from "@/lib/i18n/LanguageContext";
 interface PersonalInformationFormProps {
   register: UseFormRegister<any>;
   errors: FieldErrors<any>;
-  setValue: (field: string, value: any) => void; // ✅ tambahkan ini
+  setValue: (field: string, value: any) => void;
 }
 
 const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
@@ -23,6 +25,8 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
   setValue,
 }) => {
   const { t } = useLanguage();
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -100,13 +104,26 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
         <Label htmlFor="personalInfoPassword">
           {t("auth.password")} <span className="text-red-500">*</span>
         </Label>
-        <Input
-          id="personalInfoPassword"
-          type="password"
-          placeholder="••••••••"
-          {...register("password")}
-          className={errors.password ? "border-red-500" : ""}
-        />
+        <div className="relative">
+          <Input
+            id="personalInfoPassword"
+            type={showPassword ? "text" : "password"}
+            placeholder="••••••••"
+            {...register("password")}
+            className={errors.password ? "border-red-500 pr-10" : "pr-10"}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+          >
+            {showPassword ? (
+              <EyeOff className="h-4 w-4" />
+            ) : (
+              <Eye className="h-4 w-4" />
+            )}
+          </button>
+        </div>
         {errors.password && (
           <p className="text-sm text-red-500">
             {errors.password.message as string}
@@ -115,7 +132,9 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="ktpAddress">{t("form.ktpAddress")}</Label>
+        <Label htmlFor="ktpAddress">
+          {t("form.ktpAddress")} <span className="text-red-500">*</span>
+        </Label>
         <Input
           id="ktpAddress"
           placeholder="Address as per KTP"
@@ -130,7 +149,9 @@ const PersonalInformationForm: React.FC<PersonalInformationFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="ktpNumber">{t("form.ktpNumber")}</Label>
+        <Label htmlFor="ktpNumber">
+          {t("form.ktpNumber")} <span className="text-red-500">*</span>
+        </Label>
         <Input
           id="ktpNumber"
           placeholder="KTP Number"

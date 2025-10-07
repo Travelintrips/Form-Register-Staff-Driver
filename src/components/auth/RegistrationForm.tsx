@@ -3,7 +3,14 @@ import { useForm } from "react-hook-form";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2, Upload, CheckCircle2, ArrowLeft } from "lucide-react";
+import {
+  Loader2,
+  Upload,
+  CheckCircle2,
+  ArrowLeft,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import { registerUser } from "@/lib/supabase/auth";
 
 import { Button } from "@/components/ui/button";
@@ -46,15 +53,15 @@ const registrationSchema = z
     firstName: z.string().optional(),
     lastName: z.string().optional(),
     fullName: z.string().optional(),
-    ktpAddress: z.string().optional(),
-    ktpNumber: z.string().optional(),
+    ktpAddress: z.string().min(1, "KTP Address is required"),
+    ktpNumber: z.string().min(1, "KTP Number is required"),
     religion: z.string().optional(),
     ethnicity: z.string().optional(),
     education: z.string().optional(),
     // Contact information
-    phoneNumber: z.string().optional(),
+    phoneNumber: z.string().min(1, "Phone Number is required"),
     familyPhoneNumber: z.string().optional(),
-    licenseNumber: z.string().optional(),
+    licenseNumber: z.string().min(1, "License Number is required"),
     licenseExpiry: z.string().optional(),
     // Vehicle information (only required for Driver Mitra)
     vehicleName: z.string().optional(),
@@ -65,11 +72,19 @@ const registrationSchema = z
     vehicleColor: z.string().optional(),
     vehicleStatus: z.string().optional(),
     // Document uploads
-    selfiePhoto: z.any().optional(),
-    familyCard: z.any().optional(),
-    ktpDocument: z.any().optional(),
-    simDocument: z.any().optional(),
-    skckDocument: z.any().optional(),
+    selfiePhoto: z.any().refine((file) => file !== null && file !== undefined, {
+      message: "Selfie Photo is required",
+    }),
+    familyCard: z.any().refine((file) => file !== null && file !== undefined, {
+      message: "Family Card is required",
+    }),
+    ktpDocument: z.any().refine((file) => file !== null && file !== undefined, {
+      message: "KTP Document is required",
+    }),
+    simDocument: z.any().refine((file) => file !== null && file !== undefined, {
+      message: "SIM Document is required",
+    }),
+    skckDocument: z.any().optional(), // ✅ SKCK is now optional
     vehiclePhoto: z.any().optional(),
   })
   .refine(
@@ -92,6 +107,19 @@ const registrationSchema = z
       message: "Vehicle information is required for Driver Mitra",
       path: ["vehicleName"],
     },
+  )
+  .refine(
+    (data) => {
+      // If role is Driver Mitra, vehicle photo is required
+      if (data.role === "Driver Mitra") {
+        return data.vehiclePhoto !== null && data.vehiclePhoto !== undefined;
+      }
+      return true;
+    },
+    {
+      message: "Vehicle Photo is required for Driver Mitra",
+      path: ["vehiclePhoto"],
+    },
   );
 
 type RegistrationFormValues = z.infer<typeof registrationSchema>;
@@ -102,9 +130,12 @@ const RegistrationForm = () => {
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
   const [registrationComplete, setRegistrationComplete] = useState(false);
-  const [registeredUserRole, setRegisteredUserRole] = useState<string | null>(null);
+  const [registeredUserRole, setRegisteredUserRole] = useState<string | null>(
+    null,
+  );
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [currentTab, setCurrentTab] = useState("personal");
+  const [showPassword, setShowPassword] = useState(false);
   const [tabsSequence, setTabsSequence] = useState<string[]>([
     "personal",
     "contact",
@@ -152,6 +183,82 @@ const RegistrationForm = () => {
       vehicleStatus: "",
     },
   });
+
+  // ✅ Add validation function for tab navigation
+  const validateCurrentTab = async () => {
+    const values = {
+      role: selectedRole,
+      email: document.getElementById("email")?.value,
+      password: document.getElementById("personalInfoPassword")?.value,
+      firstName: document.getElementById("firstName")?.value,
+      lastName: document.getElementById("lastName")?.value,
+      fullName: document.getElementById("fullName")?.value,
+      ktpAddress: document.getElementById("ktpAddress")?.value,
+      ktpNumber: document.getElementById("ktpNumber")?.value,
+      phoneNumber: document.getElementById("phoneNumber")?.value,
+      licenseNumber: document.getElementById("licenseNumber")?.value,
+    };
+
+    if (currentTab === "personal") {
+      if (!values.role) {
+        setFormError("Please select a role");
+        return false;
+      }
+      if (!values.email) {
+        setFormError("Email is required");
+        return false;
+      }
+      if (!values.password || values.password.length < 6) {
+        setFormError("Password must be at least 6 characters");
+        return false;
+      }
+      if (!values.ktpAddress) {
+        setFormError("KTP Address is required");
+        return false;
+      }
+      if (!values.ktpNumber) {
+        setFormError("KTP Number is required");
+        return false;
+      }
+    }
+
+    if (currentTab === "contact") {
+      if (!values.phoneNumber) {
+        setFormError("Phone Number is required");
+        return false;
+      }
+      if (!values.licenseNumber) {
+        setFormError("License Number is required");
+        return false;
+      }
+    }
+
+    if (currentTab === "vehicle" && selectedRole === "Driver Mitra") {
+      const vehicleName = document.getElementById("vehicleName")?.value;
+      const vehicleType = document.getElementById("vehicleType")?.value;
+      const vehicleBrand = document.getElementById("vehicleBrand")?.value;
+      const licensePlate = document.getElementById("licensePlate")?.value;
+      const vehicleYear = document.getElementById("vehicleYear")?.value;
+      const vehicleColor = document.getElementById("vehicleColor")?.value;
+
+      if (
+        !vehicleName ||
+        !vehicleType ||
+        !vehicleBrand ||
+        !licensePlate ||
+        !vehicleYear ||
+        !vehicleColor
+      ) {
+        setFormError(
+          "All vehicle information fields are required for Driver Mitra",
+        );
+        return false;
+      }
+    }
+
+    setFormError(null);
+    return true;
+  };
 
   const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -219,8 +326,15 @@ const RegistrationForm = () => {
           errorMessage = error.message;
         }
 
-        if (error.message?.includes("duplicate key")) {
-          errorMessage = "An account with this email already exists";
+        // ✅ Check for duplicate email
+        if (
+          error.message?.includes("User already registered") ||
+          error.message?.includes("duplicate key") ||
+          error.message?.includes("already exists") ||
+          error.message?.includes("already been registered")
+        ) {
+          errorMessage =
+            "Email has been already registered, please create new.";
         } else if (error.message?.includes("invalid email")) {
           errorMessage = "Please enter a valid email address";
         } else if (error.message?.includes("weak password")) {
@@ -293,7 +407,7 @@ const RegistrationForm = () => {
             <h2 className="text-xl font-semibold text-center mb-6">
               Please Sign In - Choose Your Role
             </h2>
-            
+
             <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
               {/* Driver Card */}
               <Card className="hover:shadow-lg transition-shadow cursor-pointer border-2 hover:border-blue-500">
@@ -310,7 +424,8 @@ const RegistrationForm = () => {
                     className="w-full"
                     size="lg"
                     onClick={() => {
-                      window.location.href = "https://driver.travelinairport.com/";
+                      window.location.href =
+                        "https://driver.travelinairport.com/";
                     }}
                   >
                     Sign In as Driver
@@ -326,9 +441,7 @@ const RegistrationForm = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="text-center space-y-4">
-                  <p className="text-gray-600">
-                    Sign in to your Staff Account
-                  </p>
+                  <p className="text-gray-600">Sign in to your Staff Account</p>
                   <Button
                     className="w-full"
                     size="lg"
@@ -494,7 +607,9 @@ const RegistrationForm = () => {
               <TabsContent value="documents" className="space-y-4 pt-4">
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="selfiePhoto">Selfie Photo</Label>
+                    <Label htmlFor="selfiePhoto">
+                      Selfie Photo <span className="text-red-500">*</span>
+                    </Label>
                     <div className="flex items-center gap-2">
                       <Input
                         id="selfiePhoto"
@@ -518,7 +633,9 @@ const RegistrationForm = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="familyCard">Family Card</Label>
+                    <Label htmlFor="familyCard">
+                      Family Card <span className="text-red-500">*</span>
+                    </Label>
                     <div className="flex items-center gap-2">
                       <Input
                         id="familyCard"
@@ -542,7 +659,9 @@ const RegistrationForm = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="ktpDocument">KTP Document</Label>
+                    <Label htmlFor="ktpDocument">
+                      KTP Document <span className="text-red-500">*</span>
+                    </Label>
                     <div className="flex items-center gap-2">
                       <Input
                         id="ktpDocument"
@@ -566,7 +685,9 @@ const RegistrationForm = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="simDocument">SIM</Label>
+                    <Label htmlFor="simDocument">
+                      SIM <span className="text-red-500">*</span>
+                    </Label>
                     <div className="flex items-center gap-2">
                       <Input
                         id="simDocument"
@@ -615,7 +736,9 @@ const RegistrationForm = () => {
 
                   {selectedRole === "Driver Mitra" && (
                     <div className="space-y-2">
-                      <Label htmlFor="vehiclePhoto">Vehicle Photo</Label>
+                      <Label htmlFor="vehiclePhoto">
+                        Vehicle Photo <span className="text-red-500">*</span>
+                      </Label>
                       <div className="flex items-center gap-2">
                         <Input
                           id="vehiclePhoto"
@@ -668,7 +791,13 @@ const RegistrationForm = () => {
                   <Button
                     type="button"
                     className="flex-1"
-                    onClick={() => {
+                    onClick={async () => {
+                      // ✅ Validate current tab before moving to next
+                      const isValid = await validateCurrentTab();
+                      if (!isValid) {
+                        return; // Don't proceed if validation fails
+                      }
+
                       const currentIndex = tabsSequence.indexOf(currentTab);
                       if (currentIndex < tabsSequence.length - 1) {
                         const nextTab = tabsSequence[currentIndex + 1];
@@ -705,7 +834,7 @@ const RegistrationForm = () => {
             </div>
           </form>
         </CardContent>
-        <CardFooter className="flex justify-center">
+        {/*    <CardFooter className="flex justify-center">
           <p className="text-sm text-gray-600">
             {t("auth.hasAccount")}{" "}
             <a
@@ -715,7 +844,7 @@ const RegistrationForm = () => {
               {t("auth.signin")}
             </a>
           </p>
-        </CardFooter>
+        </CardFooter>*/}
       </div>
     </div>
   );

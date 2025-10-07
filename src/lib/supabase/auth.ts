@@ -160,21 +160,43 @@ export async function registerUser({
     );*/
 
     // Prepare display name for Supabase Auth - MUST have a value
-    const displayName = fullName || `${firstName || ""} ${lastName || ""}`.trim() || email;
-    
+    // ✅ Priority: Full Name > First+Last > Email
+    const displayName = (
+      fullName?.trim() ||
+      `${firstName || ""} ${lastName || ""}`.trim() ||
+      email
+    ).trim();
+
     console.log("=== DEBUG: Registration Data ===");
     console.log("firstName:", firstName);
     console.log("lastName:", lastName);
     console.log("fullName:", fullName);
-    console.log("displayName:", displayName);
+    console.log("displayName (will be used as 'name'):", displayName);
     console.log("email:", email);
-    
+
+    // 🔢 Tentukan role_id berdasarkan role
+    // ========================================
+    let roleId = 10; // Default Customer
+
+    if (role === "Admin") roleId = 1;
+    else if (role === "Driver Mitra") roleId = 2;
+    else if (role === "Driver Perusahaan") roleId = 3;
+    else if (role === "Staff Traffic") roleId = 5;
+    else if (role === "Staff Trips") roleId = 7;
+    else if (role === "Dispatcher") roleId = 8;
+    else if (role === "Agent") roleId = 11;
+
+    console.log("Mapped role_id:", roleId);
+
     // Clean up the data by removing undefined values
     const userData = {
       role,
+      role_id: roleId,
+      name: displayName, // ✅ CRITICAL: This is what Supabase Auth uses for Display Name
+      full_name: displayName,
+      display_name: displayName,
       first_name: firstName || "",
       last_name: lastName || "",
-      full_name: displayName,
       ktp_address: ktpAddress || null,
       phone_number: phoneNumber || null,
       family_phone_number: familyPhoneNumber || null,
@@ -199,10 +221,17 @@ export async function registerUser({
       vehicle_photo_url: vehiclePhotoUrl || null,
     };
 
-    // Remove any null or undefined values EXCEPT full_name, first_name, last_name, and role
+    // Remove any null or undefined values EXCEPT full_name, first_name, last_name, name, display_name, and role
     Object.keys(userData).forEach((key) => {
-      // Keep these fields even if empty
-      if (key === 'full_name' || key === 'first_name' || key === 'last_name' || key === 'role') {
+      if (
+        key === "full_name" ||
+        key === "first_name" ||
+        key === "last_name" ||
+        key === "name" ||
+        key === "display_name" ||
+        key === "role" ||
+        key === "role_id"
+      ) {
         return;
       }
       if (userData[key] === null || userData[key] === undefined) {
@@ -223,62 +252,42 @@ export async function registerUser({
     console.log("=== DEBUG: userData being sent to Supabase Auth ===");
     console.log(JSON.stringify(userData, null, 2));
 
-    const { data, error }: AuthResponse = await supabase.auth.signUp({
-      email: email,
-      password: password,
+    // ✅ Sign up user - trigger database akan handle insert ke public.users, staff, drivers
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
       options: {
-        data: {
-          ...userData,
-          display_name: displayName, // Try display_name field
-          name: displayName, // Also include name field
-        },
+        data: userData,
       },
     });
 
-    console.log("=== DEBUG: Supabase Auth Response ===");
-    console.log("data:", data);
-    console.log("error:", error);
-
     if (error) {
-      //  console.error("Supabase Auth signup error:", error);
-      /*  console.error("Error details:", {
+      console.error("❌ Error signing up:", error);
+      console.error("Error details:", {
         message: error.message,
         status: error.status,
         name: error.name,
-        stack: error.stack,
-      });*/
-      //  console.error("User data that was sent:", userData);
+      });
 
-      // Handle specific database errors with more detailed messages
+      // Return user-friendly error messages
       if (error.message?.includes("Database error saving new user")) {
-        //  console.error("Database trigger error detected");
-        /*  console.error(
-          "This indicates an issue with the handle_new_user() trigger function",
-        );*/
-        // console.error("Possible causes:");
-        //  console.error("1. Trigger function doesn't have proper permissions");
-        // console.error("2. RLS policies are blocking the insert");
-        // console.error("3. Missing columns in the users table");
-        // console.error("4. Data type mismatch in the trigger function");
-
         return {
           data: null,
           error: {
             ...error,
             message:
-              "Registration failed due to database configuration. The system could not create your user profile. Please try again or contact support if the problem persists.",
+              "Registration failed due to database configuration. Please try again or contact support.",
           } as AuthError,
         };
       }
 
-      // Handle other common auth errors
       if (error.message?.includes("User already registered")) {
         return {
           data: null,
           error: {
             ...error,
             message:
-              "An account with this email already exists. Please try logging in instead.",
+              "An account with this email already exists. Please log in instead.",
           } as AuthError,
         };
       }
@@ -306,217 +315,14 @@ export async function registerUser({
       return { data: null, error };
     }
 
-    //  console.log("User account created successfully:", data?.user?.id);
-    //  console.log("User email:", data?.user?.email);
-    //  console.log("User metadata:", data?.user?.user_metadata);
+    console.log("✅ User signed up successfully:", data?.user?.id);
+    console.log("User email:", data?.user?.email);
+    console.log("User metadata:", data?.user?.user_metadata);
 
-    const roleMapping: Record<string, number> = {
-      Admin: 1,
-      "Driver Mitra": 2,
-      "Driver Perusahaan": 3,
-      Staff: 4,
-      "Staff Traffic": 5,
-      "Staff Admin": 6,
-      "Staff Trips": 7,
-      Dispatcher: 8,
-      Pengawas: 9,
-      Customer: 10,
-    };
-
-    const roleId = roleMapping[role] || null;
-
-    // If user creation was successful, update the user profile in the public.users table directly
-    if (data?.user && !error) {
-      try {
-        // Prepare profile data for the users table update
-        const profileData: {
-          first_name?: string;
-          last_name?: string;
-          full_name?: string;
-          ktp_address?: string;
-          phone_number?: string;
-          family_phone_number?: string;
-          ktp_number?: string;
-          license_number?: string;
-          license_expiry?: string;
-          religion?: string;
-          ethnicity?: string;
-          education?: string;
-          vehicle_name?: string;
-          vehicle_type?: string;
-          vehicle_brand?: string;
-          license_plate?: string;
-          vehicle_year?: string;
-          vehicle_color?: string;
-          vehicle_status?: string;
-          selfie_photo_url?: string;
-          family_card_url?: string;
-          ktp_url?: string;
-          sim_url?: string;
-          skck_url?: string;
-          vehicle_photo_url?: string;
-        } = {};
-
-        // Only add fields that have values
-        if (firstName) profileData.first_name = firstName;
-        if (lastName) profileData.last_name = lastName;
-        if (fullName) profileData.full_name = fullName;
-        if (ktpAddress) profileData.ktp_address = ktpAddress;
-        if (phoneNumber) profileData.phone_number = phoneNumber;
-        if (familyPhoneNumber)
-          profileData.family_phone_number = familyPhoneNumber;
-        if (ktpNumber) profileData.ktp_number = ktpNumber;
-        if (licenseNumber) profileData.license_number = licenseNumber;
-        if (licenseExpiry) profileData.license_expiry = licenseExpiry;
-        if (religion) profileData.religion = religion;
-        if (ethnicity) profileData.ethnicity = ethnicity;
-        if (education) profileData.education = education;
-        if (vehicleName) profileData.vehicle_name = vehicleName;
-        if (vehicleType) profileData.vehicle_type = vehicleType;
-        if (vehicleBrand) profileData.vehicle_brand = vehicleBrand;
-        if (licensePlate) profileData.license_plate = licensePlate;
-        if (vehicleYear) profileData.vehicle_year = vehicleYear;
-        if (vehicleColor) profileData.vehicle_color = vehicleColor;
-        if (vehicleStatus) profileData.vehicle_status = vehicleStatus;
-        if (selfiePhotoUrl) profileData.selfie_photo_url = selfiePhotoUrl;
-        if (familyCardUrl) profileData.family_card_url = familyCardUrl;
-        if (ktpUrl) profileData.ktp_url = ktpUrl;
-        if (simUrl) profileData.sim_url = simUrl;
-        if (skckUrl) profileData.skck_url = skckUrl;
-        if (vehiclePhotoUrl) profileData.vehicle_photo_url = vehiclePhotoUrl;
-
-        // Only update if there's data to update
-        if (Object.keys(profileData).length > 0) {
-          // Upsert to the public.users table directly
-          // console.log("Updating user profile in database...");
-          const { error: upsertError } = await supabase.from("users").upsert(
-            {
-              id: data.user.id,
-              ...profileData,
-              role_id: roleId,
-            },
-            { onConflict: "id" },
-          );
-
-          if (upsertError) {
-            /*  console.error(
-              "Error upserting user profile in database:",
-              upsertError,
-            );*/
-            throw new Error(`Database error: ${upsertError.message}`);
-          }
-          //  console.log("User profile updated successfully");
-        }
-
-        if (
-          role === "Staff Admin" ||
-          role === "Staff Trips" ||
-          role === "Staff Traffic"
-        ) {
-          //  console.log("Inserting staff data...");
-          const { error: insertStaffError } = await supabase
-            .from("staff")
-            .insert({
-              id: data.user.id,
-              user_id: data.user.id,
-              name: fullName || "",
-              email: email || "",
-              phone: phoneNumber || "",
-              full_name: fullName || "",
-              first_name: firstName || "",
-              last_name: lastName || "",
-              role: role || "",
-              role_id: roleId,
-              religion: religion || null,
-              ethnicity: ethnicity || "",
-              address: ktpAddress || "",
-              family_phone_number: familyPhoneNumber || "",
-              ktp_number: ktpNumber || "",
-              license_number: licenseNumber || "",
-              selfie_url: selfiePhotoUrl || "",
-              kk_url: familyCardUrl || "",
-              ktp_url: ktpUrl || "",
-              skck_url: skckUrl || "",
-            });
-
-          if (insertStaffError) {
-            //  console.error("Error inserting into staff:", insertStaffError);
-            throw new Error(
-              `Staff database error: ${insertStaffError.message}`,
-            );
-          }
-          //  console.log("Staff data inserted successfully");
-        }
-
-        // Insert data into drivers table if role is Driver Mitra or Driver Perusahaan
-        if (role === "Driver Mitra" || role === "Driver Perusahaan") {
-          const driverData = {
-            id: data.user.id,
-            name: fullName || "",
-            email: email || "",
-            phone_number: phoneNumber ? Number(phoneNumber) : null,
-            full_name: fullName || "",
-            first_name: firstName || "",
-            last_name: lastName || "",
-            role_id: roleId,
-            role_name: role || "",
-            religion: religion || null,
-            ktp_address: ktpAddress || "",
-            address: ktpAddress || "",
-            ktp_number: ktpNumber || "",
-            family_phone_number: familyPhoneNumber || "",
-            license_number: licenseNumber || "",
-            license_expiry: licenseExpiry || null,
-            selfie_url: selfiePhotoUrl || "",
-            kk_url: familyCardUrl || "",
-            ktp_url: ktpUrl || "",
-            sim_url: simUrl || "",
-            skck_url: skckUrl || "",
-            status: "active",
-          };
-
-          // Add vehicle information if role is Driver Mitra
-          if (
-            role === "Driver Mitra" &&
-            vehicleName &&
-            vehicleType &&
-            vehicleBrand &&
-            licensePlate
-          ) {
-            Object.assign(driverData, {
-              model: vehicleName || "",
-              type: vehicleType || "",
-              vehicle_type: vehicleType || "",
-              make: vehicleBrand || "",
-              license_plate: licensePlate || "",
-              year: vehicleYear ? Number(vehicleYear) : null,
-              color: vehicleColor || "",
-              front_image_url: vehiclePhotoUrl || "",
-              vehicle_status: vehicleStatus || "",
-            });
-          }
-
-          // console.log("Inserting driver data...");
-          const { error: insertDriverError } = await supabase
-            .from("drivers")
-            .insert(driverData);
-
-          if (insertDriverError) {
-            //  console.error("Error inserting into drivers:", insertDriverError);
-            throw new Error(
-              `Driver database error: ${insertDriverError.message}`,
-            );
-          }
-          // console.log("Driver data inserted successfully");
-        }
-      } catch (updateError) {
-        //  console.error("Error updating user profile:", updateError);
-      }
-    }
-
+    // ✅ Return signup result - database trigger will handle the rest
     return { data, error };
   } catch (error) {
-    // console.error("Registration error:", error);
+    console.error("Registration error:", error);
     return { data: null, error: error as AuthError };
   }
 }

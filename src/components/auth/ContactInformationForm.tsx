@@ -22,8 +22,9 @@ const ContactInformationForm: React.FC<ContactInformationFormProps> = ({
         </Label>
         <Input
           id="phoneNumber"
-          placeholder="+62 123456789"
-          {...register("phoneNumber", { required: "Phone number is required" })}
+          type="tel"
+          placeholder="+62 812 3456 7890"
+          {...register("phoneNumber")}
           className={errors.phoneNumber ? "border-red-500" : ""}
         />
         {errors.phoneNumber && (
@@ -34,10 +35,13 @@ const ContactInformationForm: React.FC<ContactInformationFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="familyPhoneNumber">{t("form.familyPhoneNumber")}</Label>
+        <Label htmlFor="familyPhoneNumber">
+          {t("form.familyPhoneNumber")}
+        </Label>
         <Input
           id="familyPhoneNumber"
-          placeholder="+62 123456789"
+          type="tel"
+          placeholder="+62 812 3456 7890"
           {...register("familyPhoneNumber")}
           className={errors.familyPhoneNumber ? "border-red-500" : ""}
         />
@@ -49,10 +53,12 @@ const ContactInformationForm: React.FC<ContactInformationFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="licenseNumber">{t("form.licenseNumber")}</Label>
+        <Label htmlFor="licenseNumber">
+          {t("form.licenseNumber")} <span className="text-red-500">*</span>
+        </Label>
         <Input
           id="licenseNumber"
-          placeholder="SIM Number"
+          placeholder="License Number"
           {...register("licenseNumber")}
           className={errors.licenseNumber ? "border-red-500" : ""}
         />

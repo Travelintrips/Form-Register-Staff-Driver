@@ -25,7 +25,7 @@ export default function Home() {
           <RegistrationForm />
         </CardContent>
         <Separator className="my-2" />
-        <CardFooter className="flex flex-col space-y-2">
+        {/*  <CardFooter className="flex flex-col space-y-2">
           <div className="text-sm text-center text-muted-foreground">
             {t("common.termsAgreement") ||
               "By creating an account, you agree to our"}{" "}
@@ -52,7 +52,7 @@ export default function Home() {
               {t("auth.signin")}
             </a>
           </div>
-        </CardFooter>
+        </CardFooter>*/}
       </Card>
     </div>
   );
